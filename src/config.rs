@@ -16,14 +16,14 @@ pub struct Configuration {
 impl Default for Configuration {
     fn default() -> Self {
         Self {
-            duration: Duration::from_secs(3),
+            duration: Duration::from_secs(10),
             host: "172.217.14.238".to_string(),
-            number_of_pings: 35,
-            payload_size: 60,     // bytes
-            ping_interval: 5_000, //microseconds
+            number_of_pings: 20,
+            payload_size: 60,      // bytes
+            ping_interval: 20_000, //microseconds
             ttl: 15,
             dscp: 0,
-            source_ip: "192.168.1.68".to_string(),
+            source_ip: "192.168.1.128".to_string(),
         }
     }
 }

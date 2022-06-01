@@ -43,7 +43,7 @@ pub fn run_ping(configuration: &Configuration) -> PingResults {
     let bucket_size = (configuration.number_of_pings + 1) as usize;
     let mut bucket = vec![Instant::now(); bucket_size];
     let mut result_map: HashMap<usize, (u128, u8)> = HashMap::with_capacity(bucket_size);
-    let mut reply_packet_seq_number: u16 = 0;
+    let mut reply_packet_seq_number: u16 = 1;
 
     let mut buffer_ip = vec![0u8; IPV4_HEADER_LEN + IPV4_BUFFER];
     let mut buffer_icmp = vec![0u8; configuration.payload_size + ICMP_HEADER_LEN]; // 8 header bytes, then payload
@@ -102,7 +102,7 @@ pub fn run_ping(configuration: &Configuration) -> PingResults {
         ////////////////////////////////////////////////
         // Timeout Bug:
         //////////////////////////////////////////////
-        if let Ok(option) = iter.next_with_timeout(ping_duration_from_interval) {
+        while let Ok(option) = iter.next_with_timeout(Duration::from_millis(100)) {
             let received_at = Instant::now();
             // debug!("Received message {:?} at {:?}", option, received_at);
 
@@ -116,8 +116,6 @@ pub fn run_ping(configuration: &Configuration) -> PingResults {
                     ping_results.init_dscp_return = dscp;
                     ping_results.dscp_changed = true;
                 }
-
-                debug!("Received message {}", reply_packet_seq_number);
 
                 // Leaving this for convenience when implementing IPv6
                 let source = packet.get_source();
@@ -139,12 +137,16 @@ pub fn run_ping(configuration: &Configuration) -> PingResults {
                     received_at,
                 );
 
+                debug!("Received message {}", reply_packet_seq_number);
+
                 // If
                 if reply_packet_seq_number != 0 {
                     result_map
                         .entry(reply_packet_seq_number as usize)
                         .or_insert((delta_t.as_micros(), packet_type));
                 }
+            } else {
+                break;
             }
         }
 

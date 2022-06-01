@@ -9,7 +9,7 @@ mod utils;
 
 fn main() {
     let mut env_logger = env_logger::builder();
-    env_logger.filter_level(LevelFilter::Info).init();
+    env_logger.filter_level(LevelFilter::Debug).init();
     let config = Configuration::default();
     let mut test_result = run_ping(&config);
     test_result.rtt_statistics.calculate();
