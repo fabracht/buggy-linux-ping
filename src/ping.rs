@@ -102,7 +102,7 @@ pub fn run_ping(configuration: &Configuration) -> PingResults {
         ////////////////////////////////////////////////
         // Timeout Bug:
         //////////////////////////////////////////////
-        while let Ok(option) = iter.next_with_timeout(ping_duration_from_interval) {
+        'inner: while let Ok(option) = iter.next_with_timeout(ping_duration_from_interval) {
             let received_at = Instant::now();
             // debug!("Received message {:?} at {:?}", option, received_at);
 
@@ -146,7 +146,7 @@ pub fn run_ping(configuration: &Configuration) -> PingResults {
                         .or_insert((delta_t.as_micros(), packet_type));
                 }
             } else {
-                break;
+                break 'inner;
             }
         }
 
